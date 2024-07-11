@@ -106,8 +106,16 @@ clear_lyrics_from_screen() {
     done
 }
 
+# Function to clear song info
+clear_song_info_from_screen() {
+    for (( i=0; i<4; i++ )); do
+        tput cup $i 71
+        printf "| %-50s\n" ""
+    done
+}
+
 # ANSI escape codes for color and formatting
-white='\033[37m'
+bold_white='\033[1;37m'
 blue='\033[34m'
 reset='\033[0m'
 
@@ -136,6 +144,7 @@ while true; do
             ascii_art="No artwork available"
         fi
         lyrics=""  # Clear lyrics when the song changes
+        clear_song_info_from_screen  # Clear the song info from the screen
         clear_lyrics_from_screen  # Clear the lyrics from the screen
     fi
     
@@ -149,17 +158,16 @@ while true; do
     for (( i=0; i<$max_lines; i++ )); do
         ascii_line="${ascii_lines[i]}"
         if [[ $i -eq 0 ]]; then
-            info_line="${white}${trackName}${reset}"
+            printf "%-70s | ${bold_white}%s${reset}\n" "$ascii_line" "$trackName"
         elif [[ $i -eq 1 ]]; then
-            info_line="$trackArtist"
+            printf "%-70s | %s\n" "$ascii_line" "$trackArtist"
         elif [[ $i -eq 2 ]]; then
-            info_line="$trackAlbum"
+            printf "%-70s | %s\n" "$ascii_line" "$trackAlbum"
         elif [[ $i -eq 3 ]]; then
-            info_line="Status: $playStatus"
+            printf "%-70s | %s\n" "$ascii_line" "Status: $playStatus"
         else
-            info_line=""
+            printf "%-70s | %s\n" "$ascii_line" ""
         fi
-        printf "%-70s | %s\n" "$ascii_line" "$info_line"
     done
 
     # Clear the remaining lines where the lyrics will be displayed
