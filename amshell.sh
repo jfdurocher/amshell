@@ -101,16 +101,16 @@ EOF
 # Function to clear the lyrics from the screen
 clear_lyrics_from_screen() {
     for (( i=4; i<36; i++ )); do
-        tput cup $i 71
-        printf "| %-50s\n" ""
+        tput cup $i 0
+        printf "%-122s\n" ""
     done
 }
 
 # Function to clear song info
 clear_song_info_from_screen() {
     for (( i=0; i<4; i++ )); do
-        tput cup $i 71
-        printf "| %-50s\n" ""
+        tput cup $i 0
+        printf "%-122s\n" ""
     done
 }
 
@@ -144,6 +144,7 @@ while true; do
             ascii_art="No artwork available"
         fi
         lyrics=""  # Clear lyrics when the song changes
+        clear  # Clear the entire screen
         clear_song_info_from_screen  # Clear the song info from the screen
         clear_lyrics_from_screen  # Clear the lyrics from the screen
     fi
