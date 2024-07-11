@@ -1,5 +1,9 @@
 # amshell
 An Apple Music shell/terminal display and controller.
+
+![alt text](https://github.com/jfdurocher/amshell/blob/main/screenshot.png?raw=true)
+
+
 ## How to install
 
 Download or clone down the repo & run the amshell.sh file in your mac os terminal.
