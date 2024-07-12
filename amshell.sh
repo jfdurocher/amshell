@@ -1,6 +1,9 @@
 #!/bin/bash
 
-# amshell.sh version 1.2
+# amshell.sh version 1.3
+
+# Set the terminal window title
+echo -ne "\033]0;Apple Music Shell\007"
 
 # Check if jq is installed
 if ! command -v jq &> /dev/null
@@ -24,16 +27,20 @@ tell application "Music"
         set trackName to name of current track
         set trackArtist to artist of current track
         set trackAlbum to album of current track
+        set trackDuration to duration of current track -- in seconds
+        set currentTime to player position -- in seconds
         set playStatus to "Playing"
-        return trackName & "\t" & trackArtist & "\t" & trackAlbum & "\t" & playStatus
+        return trackName & "\t" & trackArtist & "\t" & trackAlbum & "\t" & playStatus & "\t" & trackDuration & "\t" & currentTime
     else if player state is paused then
         set trackName to name of current track
         set trackArtist to artist of current track
         set trackAlbum to album of current track
+        set trackDuration to duration of current track -- in seconds
+        set currentTime to player position -- in seconds
         set playStatus to "Paused"
-        return trackName & "\t" & trackArtist & "\t" & trackAlbum & "\t" & playStatus
+        return trackName & "\t" & trackArtist & "\t" & trackAlbum & "\t" & playStatus & "\t" & trackDuration & "\t" & currentTime
     else
-        return "\t\t\tStopped"
+        return "\t\t\tStopped\t\t\t\t"
     end if
 end tell
 EOF
@@ -114,6 +121,27 @@ clear_song_info_from_screen() {
     done
 }
 
+# Function to display the song tracker
+display_song_tracker() {
+    local currentTime="$1"
+    local trackDuration="$2"
+    local trackBarWidth=70
+    local currentTimeInt=${currentTime%.*}  # Convert to integer
+    local trackDurationInt=${trackDuration%.*}  # Convert to integer
+    local progress=$((currentTimeInt * trackBarWidth / trackDurationInt))
+    
+    tput cup 36 0
+    printf "\033[1;37m["  # Start the bar with white color
+    for (( i=0; i<$trackBarWidth; i++ )); do
+        if [ $i -lt $progress ]; then
+            printf "="
+        else
+            printf " "
+        fi
+    done
+    printf "] %02d:%02d / %02d:%02d\033[0m\n" $((currentTimeInt / 60)) $((currentTimeInt % 60)) $((trackDurationInt / 60)) $((trackDurationInt % 60))
+}
+
 # ANSI escape codes for color and formatting
 bold_white='\033[1;37m'
 blue='\033[34m'
@@ -131,7 +159,7 @@ lyrics=""
 # Infinite loop to update the song info every second and check for key presses
 while true; do
     # Get the current song info and status
-    IFS=$'\t' read -r trackName trackArtist trackAlbum playStatus <<< "$(get_current_song_and_status)"
+    IFS=$'\t' read -r trackName trackArtist trackAlbum playStatus trackDuration currentTime <<< "$(get_current_song_and_status)"
     new_song="$trackName by $trackArtist from the album $trackAlbum"
 
     # Only update the artwork if the song has changed
@@ -187,8 +215,11 @@ while true; do
         printf "| ${blue}%s${reset}\n" "${lyrics_lines[i]}"
     done
     
+    # Display the song tracker
+    display_song_tracker "$currentTime" "$trackDuration"
+    
     # Check for user input with a timeout of 3 seconds
-    if read -t 3 -n 1 key; then
+    if read -t 0 -n 1 key; then
         case "$key" in
             p) play_music ;;
             a) pause_music ;;
@@ -198,9 +229,9 @@ while true; do
                 tput cnorm  # Show cursor
                 clear
                 exit 0
-                ;;
+           ;;
         esac
-    fi
+    fi    
 
     # Refresh every 3 seconds if no key is pressed
 done
