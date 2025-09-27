@@ -6,8 +6,12 @@ An Apple Music shell/terminal display and controller.
 
 ## How to install
 
-Download or clone down the repo & run the amshell.sh file in your mac os terminal.
-Make sure to have jp2a and jq installed using homebrew
+Download or clone the repo and run the `amshell.sh` file in your macOS Terminal. (macOS only; uses AppleScript.)
+Install dependencies with Homebrew:
+
+```bash
+brew install jp2a jq
+```
 
 ## How to use
 
@@ -17,4 +21,4 @@ Make sure to have jp2a and jq installed using homebrew
 | pause    | a   | Pause music                |
 | next     | n   | Next song                  |
 | previous | b   | Previous song              |
-| quit     | s   | Exit script                |
+| quit     | q   | Exit script                |
